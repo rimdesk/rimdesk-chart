@@ -1,0 +1,48 @@
+deployment:
+  name: rimdesk-app
+  restartPolicy: Always
+  replicaCount: 1
+  image:
+    name: rimdesk-app
+    repository: rimdesk/rimdesk-app
+    tag: latest
+    pullPolicy: Never
+  ports:
+    containerPort: 8080
+
+configMap:
+  name: rimdesk-app
+  data:
+    APP_NAME: "RIMDesk APP"
+    SERVER_PORT: "8080"
+    DB_HOST: ""
+    DB_TYPE: "sqlite"
+    DB_PORT: ""
+    DB_USER: ""
+    DB_PASS: ""
+    DB_NAME: ""
+
+    RABBITMQ_HOST: ""
+    RABBITMQ_PORT: ""
+    RABBITMQ_USER: ""
+    RABBITMQ_PASSWORD: ""
+    RABBITMQ_QUEUE: ""
+    RABBITMQ_PROTOCOL: ""
+
+service:
+  name: rimdesk-app
+  port: 8080
+  targetPort: 8080
+  type: ClusterIP
+
+virtualService:
+  name: rimdesk-app
+  gateways:
+    name: rimdesk-gateway
+  hosts:
+    name: rimdesk-host
+  http:
+    name: rimdesk-app
+    prefix: "/v1/rimdesk"
+    destination: rimdesk-app.rimdesk-prod.svc.cluster.local
+    allowedOrigins: "*"
